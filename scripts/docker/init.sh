@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Python
+#Скачиваем Python - для генератора
 sudo apt-get update -y
 sudo apt-get install -y python
 
