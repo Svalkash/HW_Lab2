@@ -16,24 +16,23 @@ public class ActionCounter {
      * @return результат подсчета в формате JavaRDD
      */
     public static JavaRDD<String> countPostActions(JavaRDD<String> inputRDD, Map<Integer, String> typeIDs) {
-        JavaRDD<PostAction> actions = inputRDD.map(s -> { //transform to PA
-            try {
-                // Предполагается, что входные данные - целые числа, разделённые запятыми с пробелами.
-                // Любое несоответствие приводит к ошибке.
-                String[] fields = s.split(", ");
-                if (fields.length != 4)
-                    throw new RuntimeException("Wrong field count");
-                PostAction pa = new PostAction(Integer.parseInt(fields[0]), fields[1], Long.parseLong(fields[2]), Integer.parseInt(fields[3]));
-                if (!typeIDs.containsKey(pa.type))
-                    throw new RuntimeException("Non-existing type");
-                return pa;
-            } catch (Exception ex) { // Если строку не получилось разбить на массив целых чисел.
-                log.error(ex.getMessage());
-                return null;
-            }
-        });
-
-        JavaRDD<String> ret = actions
+        return inputRDD
+                .map(s -> { //transform to PA
+                    try {
+                        // Предполагается, что входные данные - целые числа, разделённые запятыми с пробелами.
+                        // Любое несоответствие приводит к ошибке.
+                        String[] fields = s.split(", ");
+                        if (fields.length != 4)
+                            throw new RuntimeException("Wrong field count");
+                        PostAction pa = new PostAction(Integer.parseInt(fields[0]), fields[1], Long.parseLong(fields[2]), Integer.parseInt(fields[3]));
+                        if (!typeIDs.containsKey(pa.type))
+                            throw new RuntimeException("Non-existing type");
+                        return pa;
+                    } catch (Exception ex) { // Если строку не получилось разбить на массив целых чисел.
+                        log.error(ex.getMessage());
+                        return null;
+                    }
+                })
                 .filter(s -> s != null) //clear nulls (incorrect data)
                 .mapToPair(pa -> new Tuple2<>(new Tuple2<>(pa.postID, pa.userID), pa.type)) //remove time so it won't be in our way AND turn it into a pair like (postID, userID) | type
                 .reduceByKey((a, b) -> Math.min(a, b)) //leave only the "best" type (read < open < no read, for example)
@@ -43,7 +42,6 @@ public class ActionCounter {
                 .map(newPair -> newPair._1._1.toString() + ", " + typeIDs.get(newPair._1._2) + ", " + newPair._2) //turn into CSV: "postID,typeName,"
                 .sortBy(a->a, true, 1); //because f* lists
         //log.info(ret.collect().toString());
-        return ret;
     }
 
 }

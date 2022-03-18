@@ -88,6 +88,7 @@ public class SparkApplication {
         log.info("Application started!");
         log.debug("Application started");
         SparkConf conf = new SparkConf().setAppName("SparkApplication").setMaster("local");
+        conf.set("spark.files.ignoreCorruptFiles", "true");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         //JavaRDD<String> din = sc.textFile(args[0]);
