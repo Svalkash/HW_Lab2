@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>bdtc</groupId>
-    <artifactId>lab2</artifactId>
+    <artifactId>Lab2</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
@@ -59,7 +59,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>SparkApplication</mainClass>
+                            <mainClass>bdtc.Lab2.SparkApplication</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
